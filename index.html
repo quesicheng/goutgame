@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>痛风&别嘌呤醇 生化科普游戏</title>
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html,body{
+  min-height:100vh;
+}
+
+body{
+  background-color:#f5f8fa;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  background-attachment:fixed;
+
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+
+  padding:30px 20px;
+  font-family:"微软雅黑","Microsoft YaHei",sans-serif;
+
+  overflow:hidden;
+}
+
+/* ========== 游戏封面 ========== */
+#cover{
+  position:fixed;
+  inset:0;
+  background:
+    linear-gradient(rgba(20,40,80,0.55),rgba(20,40,80,0.75)),
+    url("cover.jpg") center/cover no-repeat;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  color:#fff;
+  text-align:center;
+  z-index:999;
+  padding:20px;
+}
+
+#cover h1{
+  font-size:42px;
+  margin-bottom:16px;
+  letter-spacing:4px;
+  text-shadow:0 4px 18px rgba(0,0,0,0.45);
+}
+
+#cover p{
+  font-size:18px;
+  margin-bottom:40px;
+  opacity:0.9;
+  max-width:560px;
+  line-height:1.7;
+}
+
+#startBtn{
+  padding:14px 42px;
+  font-size:18px;
+  border:none;
+  border-radius:999px;
+  background:#346fc9;
+  color:#fff;
+  cursor:pointer;
+  letter-spacing:6px;
+  transition:0.25s;
+  box-shadow:0 8px 24px rgba(52,111,201,0.45);
+}
+
+#startBtn:hover{
+  background:#275aa7;
+  transform:translateY(-2px);
+}
+
+/* ========== 游戏主体文字框 ========== */
+#box{
+  background:rgba(255,255,255,0.88);
+  padding:25px;
+  border-radius:14px;
+  line-height:1.7;
+  font-size:17px;
+  color:#222;
+  box-shadow:0 2px 10px rgba(0,0,0,0.1);
+  max-width:720px;
+  width:100%;
+  margin-bottom:40px;
+
+  display:none;
+}
+
+#text{
+  min-height:90px;
+  margin-bottom:18px;
+  white-space:pre-wrap;
+}
+
+button{
+  width:100%;
+  padding:13px;
+  margin:9px 0;
+  border:none;
+  border-radius:8px;
+  background:#346fc9;
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+button:hover{
+  background:#275aa7;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 游戏封面 -->
+<div id="cover">
+  <h1>痛风与别嘌呤醇</h1>
+  <p>一段关于高尿酸、嘌呤代谢与用药机制的生化科普冒险。<br>模拟真实门诊问诊，从症状判断，逐步学习痛风生化知识。</p>
+  <button id="startBtn">开 始 游 戏</button>
+</div>
+
+<!-- 游戏正文 -->
+<div id="box">
+  <div id="text"></div>
+  <div id="btnList"></div>
+</div>
+
+<script>
+const bg = {
+  cover: "cover.jpg",
+  start: "start.jpg",
+  room: "room.jpg",
+  life: "life.jpg",
+  drug: "drug.jpg"
+};
+
+const story = {
+  start:{
+    t:"【医院候诊大厅】\n最近一段时间你经常熬夜复习生化，外卖常吃火锅，还爱喝甜饮料。昨夜大脚趾突然剧烈红肿疼痛，难以忍受，今天你来内分泌门诊就诊。护士叫号，轮到你进入诊室。",
+    bg:bg.start,
+    b:[
+      {n:"进入诊室，向医生描述症状",next:"room"}
+    ]
+  },
+
+  room:{
+    t:"【医生诊室】\n医生：你好，请说说哪里不舒服，发作多久了？",
+    bg:bg.room,
+    b:[
+      {n:"昨夜大脚趾红肿剧痛，夜间痛醒",next:"symptom1"},
+      {n:"持续腹痛，恶心反胃",next:"symptomWrong"}
+    ]
+  },
+  symptomWrong:{
+    t:"【医生问诊】\n医生：你描述的是消化道症状，和你本次就诊情况不符，请重新描述你的不适。",
+    bg:bg.room,
+    b:[{n:"重新描述症状",next:"room"}]
+  },
+
+  symptom1:{
+    t:"【医生问诊】\n你：昨夜大脚趾突然红肿剧痛，直接痛醒。\n医生听完你的主诉，开了化验单。片刻后拿到报告，血尿酸明显升高。\n医生：结合你的急性单关节疼痛表现+血尿酸升高，初步考虑痛风。那你知道体内尿酸是如何生成的吗？",
+    bg:bg.room,
+    b:[
+      {n:"尿酸是蛋白质代谢产物",next:"errA"},
+      {n:"尿酸是嘌呤代谢的终产物",next:"okA"},
+      {n:"尿酸来自脂肪分解",next:"errB"}
+    ]
+  },
+
+  errA:{
+    t:"【答错科普】\n不对哦！蛋白质代谢产物是尿素；脂肪代谢会生成酮体。尿酸是嘌呤代谢的终产物。",
+    bg:bg.room,
+    b:[{n:"重新回答医生的问题",next:"symptom1"}]
+  },
+
+  errB:{
+    t:"【答错科普】\n不对哦！蛋白质代谢产物是尿素；脂肪代谢会生成酮体。尿酸是嘌呤代谢的终产物。",
+    bg:bg.room,
+    b:[{n:"重新回答医生的问题",next:"symptom1"}]
+  },
+
+  okA:{
+    t:"【回答正确✅】\n没错！嘌呤经过多步代谢，黄嘌呤氧化酶催化黄嘌呤和次黄嘌呤，最终生成尿酸。如果尿酸过多，析出结晶并沉积在关节，就会诱发痛风急性发作。\n接下来准备给你介绍治疗药物，你想先问问医生日常生活中哪些习惯会升高尿酸吗？",
+    bg:bg.room,
+    b:[
+      {n:"询问医生：生活上有哪些要注意的？",next:"lifeQ"},
+      {n:"直接了解治疗药物",next:"drug"}
+    ]
+  },
+
+  lifeQ:{
+    t:"【生活习惯科普】\n医生：很多高尿酸、痛风都与生活习惯密切相关。请问以下哪一种行为最容易升高尿酸、诱发痛风？",
+    bg:bg.life,
+    b:[
+      {n:"长期喝高果糖奶茶、甜饮料",next:"lifeOk"},
+      {n:"大量吃青菜瓜果",next:"lifeErr1"},
+      {n:"日常大量喝水",next:"lifeErr2"}
+    ]
+  },
+
+  lifeErr1:{
+    t:"【科普纠错】\n蔬菜大多属于低嘌呤食物，并不会升高尿酸。真正的高危诱因包括果糖、动物内脏、海鲜、酒精和熬夜。",
+    bg:bg.life,
+    b:[{n:"继续学习高危诱因",next:"lifeOk"}]
+  },
+
+  lifeErr2:{
+    t:"【科普纠错】\n多喝水能够促进尿酸随尿液排出，是保护肾脏、降低尿酸的好习惯，不会诱发痛风。",
+    bg:bg.life,
+    b:[{n:"继续学习高危诱因",next:"lifeOk"}]
+  },
+
+  lifeOk:{
+    t:"【生活科普完成✅】\n重点：果糖代谢会直接生成尿酸，是当代年轻人痛风高发的重要诱因。高危因素包括甜饮料、动物内脏、浓肉汤、啤酒和熬夜久坐。\n了解完生活注意事项，接下来我们来看治疗药物别嘌呤醇。",
+    bg:bg.life,
+    b:[{n:"进入用药咨询室",next:"drug"}]
+  },
+
+  drug:{
+    t:"【用药咨询室】\n医生：结合你的病情，可以使用别嘌呤醇进行治疗。你好奇它是怎样降低尿酸的？",
+    bg:bg.drug,
+    b:[
+      {n:"促进肾脏排出尿酸",next:"drugErr1"},
+      {n:"抑制黄嘌呤氧化酶，减少尿酸生成",next:"drugOk"},
+      {n:"溶解已经形成的尿酸结晶",next:"drugErr2"}
+    ]
+  },
+
+  drugErr1:{
+    t:"【考点纠错】\n促进肾脏排出尿酸是苯溴马隆的作用机制！别嘌呤醇并不是通过增加肾脏排泄来降尿酸的。",
+    bg:bg.drug,
+    b:[{n:"重新选择",next:"drug"}]
+  },
+
+  drugErr2:{
+    t:"【考点纠错】\n溶解结晶不是别嘌呤醇的主要作用。别嘌呤醇不能直接溶解已经存在的尿酸结晶，它主要是减少尿酸生成。",
+    bg:bg.drug,
+    b:[{n:"重新选择",next:"drug"}]
+  },
+
+  drugOk:{
+    t:"【通关总结✅】\n1. 痛风：高尿酸状态下，尿酸盐结晶沉积在关节并诱发急性炎症。\n2. 尿酸：嘌呤代谢的终产物。\n3. 别嘌呤醇：黄嘌呤氧化酶的竞争性抑制剂，可阻断嘌呤氧化，从源头减少尿酸生成。\n4. 高危因素：高果糖饮料、高嘌呤饮食、饮酒和熬夜。\n【生化科普学习完成！】",
+    bg:bg.drug,
+    b:[]
+  }
+};
+
+let current = "start";
+let typingTimer = null;
+let isTyping = false;
+
+// 开始游戏：隐藏封面，显示正文框
+document.getElementById("startBtn").addEventListener("click", startGame);
+
+function startGame(){
+  document.getElementById("cover").style.display = "none";
+  document.getElementById("box").style.display = "block";
+  render();
+}
+
+// 逐字打出文字
+function typeText(element, text, speed = 40){
+  clearInterval(typingTimer);
+  element.innerText = "";
+  isTyping = true;
+
+  let i = 0;
+  typingTimer = setInterval(() => {
+    if (i < text.length) {
+      element.innerText += text.charAt(i);
+      i++;
+    } else {
+      clearInterval(typingTimer);
+      isTyping = false;
+    }
+  }, speed);
+}
+
+function render(){
+  const data = story[current];
+  document.body.style.backgroundImage = `url(${data.bg})`;
+
+  const textEl = document.getElementById("text");
+  const btnList = document.getElementById("btnList");
+
+  btnList.innerHTML = "";
+
+  typeText(textEl, data.t, 40);
+
+  setTimeout(() => {
+    if (!isTyping) {
+      showButtons(data.b);
+    } else {
+      const checkTimer = setInterval(() => {
+        if (!isTyping) {
+          clearInterval(checkTimer);
+          showButtons(data.b);
+        }
+      }, 100);
+    }
+  }, 500);
+}
+
+function showButtons(buttons){
+  const btnList = document.getElementById("btnList");
+  btnList.innerHTML = "";
+
+  buttons.forEach(item => {
+    const btn = document.createElement("button");
+    btn.innerText = item.n;
+    btn.onclick = () => go(item.next);
+    btnList.appendChild(btn);
+  });
+}
+
+function go(id){
+  current = id;
+  render();
+}
+</script>
+
+</body>
+</html>
